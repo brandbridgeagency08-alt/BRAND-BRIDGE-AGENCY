@@ -16,7 +16,7 @@ export default function App() {
   );
 }
 
-// Explicit manual mount for platform safety and immediate UI visibility
+// Explicit manual mount for platform safety
 const rootElement = document.getElementById("root");
 if (rootElement) {
   const root = createRoot(rootElement);
