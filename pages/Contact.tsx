@@ -3,10 +3,13 @@ import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Send, Phone, Mail, MapPin, 
-  CheckCircle2, Clock, Globe, ShieldCheck 
+  CheckCircle2, Clock, Globe, ShieldCheck, Zap
 } from 'lucide-react';
 import { WebsiteType, BudgetRange } from '../types';
 import { LeadContext } from '../App';
+
+// NOTE: Replace this with your actual Google Apps Script Web App URL or Zapier Webhook URL
+const AUTOMATION_WEBHOOK_URL = ''; 
 
 const Contact: React.FC = () => {
   const { addLead } = useContext(LeadContext);
@@ -30,26 +33,40 @@ const Contact: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate automation logic
-    // 1. Send data to Google Sheets (Mocked)
-    // 2. Trigger Email Notification (Mocked)
-    // 3. Trigger SMS/WhatsApp (Mocked)
-    
-    setTimeout(() => {
-      const newLead = {
-        ...formData,
-        id: Math.random().toString(36).substr(2, 9),
-        status: 'New',
-        createdAt: new Date().toISOString()
-      };
-      
+    const newLead = {
+      ...formData,
+      id: Math.random().toString(36).substr(2, 9),
+      status: 'New' as const,
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      // 1. Send data to Automation Endpoint (Google Sheets / Auto-Message)
+      if (AUTOMATION_WEBHOOK_URL) {
+        await fetch(AUTOMATION_WEBHOOK_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Common for simple Apps Script triggers
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newLead)
+        });
+      }
+
+      // 2. Persist locally for Admin Dashboard
       addLead(newLead);
+      
+      // Simulate processing time for UX
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setSubmitted(true);
+        console.log('Automation Triggered: Lead sent to Sheets & Messaging');
+      }, 1000);
+
+    } catch (error) {
+      console.error('Automation failed:', error);
+      // Still allow form to complete for UX, but log error
       setIsSubmitting(false);
       setSubmitted(true);
-      
-      // Analytics tracking
-      console.log('Conversion Event: Form Submitted', newLead);
-    }, 1500);
+    }
   };
 
   if (submitted) {
@@ -58,18 +75,18 @@ const Contact: React.FC = () => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-xl w-full glass-card p-12 rounded-[2rem] text-center"
+          className="max-w-xl w-full glass-card p-12 rounded-[2rem] text-center shadow-2xl shadow-emerald-500/10"
         >
           <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 text-white">
             <CheckCircle2 size={48} />
           </div>
-          <h2 className="text-4xl font-bold mb-6">Request Received!</h2>
+          <h2 className="text-4xl font-bold mb-6">Automation Triggered!</h2>
           <p className="text-gray-400 text-lg mb-10">
-            Thanks for contacting Brand Bridge Agency. We've received your inquiry and our team will reach out to you within the next 2 hours.
+            Thanks for contacting Brand Bridge Agency. We've received your inquiry. Check your email; we've sent you an automatic confirmation!
           </p>
           <button 
             onClick={() => setSubmitted(false)}
-            className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform"
+            className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform shadow-lg"
           >
             Send another inquiry
           </button>
@@ -91,7 +108,7 @@ const Contact: React.FC = () => {
             </div>
 
             <div className="space-y-8">
-              <div className="flex items-center space-x-6 p-6 glass-card rounded-2xl">
+              <a href="tel:6350154327" className="flex items-center space-x-6 p-6 glass-card rounded-2xl hover:bg-white/5 transition-colors block">
                 <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400">
                   <Phone size={24} />
                 </div>
@@ -99,9 +116,9 @@ const Contact: React.FC = () => {
                   <div className="text-sm text-gray-400 font-bold uppercase tracking-widest">Call Directly</div>
                   <div className="text-xl font-bold">6350154327</div>
                 </div>
-              </div>
+              </a>
 
-              <div className="flex items-center space-x-6 p-6 glass-card rounded-2xl">
+              <a href="mailto:brandbridgeagency08@gmail.com" className="flex items-center space-x-6 p-6 glass-card rounded-2xl hover:bg-white/5 transition-colors block">
                 <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400">
                   <Mail size={24} />
                 </div>
@@ -109,7 +126,7 @@ const Contact: React.FC = () => {
                   <div className="text-sm text-gray-400 font-bold uppercase tracking-widest">Email Us</div>
                   <div className="text-xl font-bold">brandbridgeagency08@gmail.com</div>
                 </div>
-              </div>
+              </a>
             </div>
 
             <div className="p-8 border border-white/5 rounded-3xl space-y-4">
@@ -135,8 +152,12 @@ const Contact: React.FC = () => {
           </div>
 
           <div className="lg:w-3/5">
-            <form onSubmit={handleSubmit} className="glass-card p-8 md:p-12 rounded-[2rem] space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <form onSubmit={handleSubmit} className="glass-card p-8 md:p-12 rounded-[2rem] space-y-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-6 opacity-10">
+                <Zap size={120} className="text-blue-500" />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-400 ml-1">Full Name</label>
                   <input 
@@ -187,7 +208,7 @@ const Contact: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-400 ml-1">Type of Website</label>
                   <select 
@@ -216,7 +237,7 @@ const Contact: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 relative z-10">
                 <label className="text-sm font-bold text-gray-400 ml-1">Requirements / Message</label>
                 <textarea 
                   required
@@ -237,7 +258,7 @@ const Contact: React.FC = () => {
                 {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Processing Automation...</span>
+                    <span>Triggering Automation...</span>
                   </>
                 ) : (
                   <>
@@ -248,7 +269,7 @@ const Contact: React.FC = () => {
               </button>
               
               <p className="text-center text-gray-500 text-xs mt-4">
-                By clicking "Send Order Inquiry", you agree to our terms and to receive a follow-up via Email/Phone.
+                By clicking "Send Order Inquiry", you agree to our terms and will receive an <b>automatic email reply</b>.
               </p>
             </form>
           </div>

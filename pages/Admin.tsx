@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { 
   LogIn, Database, Search, Filter, 
   Trash2, Mail, Phone, ExternalLink, 
-  CheckCircle, Clock, MoreHorizontal, Download
+  CheckCircle, Clock, MoreHorizontal, Download, Shield
 } from 'lucide-react';
 import { LeadContext } from '../App';
 
@@ -17,11 +17,12 @@ const Admin: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'admin123') { // Simple mock auth
+    // Updated credential per user request
+    if (password === 'tushar rishi') { 
       setIsAuthenticated(true);
       setError('');
     } else {
-      setError('Invalid admin credentials');
+      setError('Invalid agency credentials. Access denied.');
     }
   };
 
@@ -47,30 +48,36 @@ const Admin: React.FC = () => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full glass-card p-10 rounded-3xl"
+          className="max-w-md w-full glass-card p-10 rounded-3xl shadow-2xl shadow-blue-500/10"
         >
           <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-8 text-blue-400">
-            <LogIn size={32} />
+            <Shield size={32} />
           </div>
-          <h2 className="text-3xl font-bold text-center mb-8">Admin Access</h2>
+          <h2 className="text-3xl font-bold text-center mb-2">Agency Access</h2>
+          <p className="text-gray-500 text-center mb-8 text-sm">Secure Portal for Brand Bridge Agency Admins</p>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-400">Admin Password</label>
+              <label className="text-sm font-bold text-gray-400 ml-1">Master Password</label>
               <input 
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:outline-none focus:border-blue-500"
+                placeholder="••••••••••••"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:outline-none focus:border-blue-500 transition-all text-center tracking-widest"
               />
-              {error && <p className="text-red-400 text-xs font-bold">{error}</p>}
+              {error && (
+                <motion.p 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-red-400 text-xs font-bold text-center mt-2"
+                >
+                  {error}
+                </motion.p>
+              )}
             </div>
-            <button className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors">
-              Access Dashboard
+            <button className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-all active:scale-95 shadow-lg shadow-white/5">
+              Unlock Dashboard
             </button>
-            <p className="text-center text-gray-500 text-xs italic">
-              Hint: use 'admin123' for the demo
-            </p>
           </form>
         </motion.div>
       </div>
