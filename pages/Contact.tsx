@@ -47,8 +47,9 @@ const Contact: React.FC = () => {
 
     try {
       /**
-       * 🔥 AUTOMATION CONNECTIVITY logic
-       * Uses text/plain to bypass CORS preflight and follows redirect to read the JSON response.
+       * 🔥 SENIOR ENGINEER FIX:
+       * 1. Content-Type: 'text/plain;charset=utf-8' bypasses the CORS preflight (OPTIONS).
+       * 2. Using res.text() -> JSON.parse() handles redirect responses and mobile compatibility issues better.
        */
       const response = await fetch(AUTOMATION_WEBHOOK_URL, {
         method: 'POST',
@@ -58,9 +59,16 @@ const Contact: React.FC = () => {
         body: JSON.stringify(newLead)
       });
 
-      // Google Apps Script redirects usually mean the request was received.
-      // If we can parse the response, we check for explicit success.
-      const result = await response.json();
+      // Get raw text first to avoid parser errors on empty/malformed responses
+      const rawText = await response.text();
+      let result;
+      
+      try {
+        result = JSON.parse(rawText);
+      } catch (parseError) {
+        console.error("Parse Error:", rawText);
+        throw new Error("Could not parse automation response.");
+      }
       
       if (result && result.success === true) {
         console.log("Automation: Lead confirmed and emails triggered.");
@@ -74,7 +82,7 @@ const Contact: React.FC = () => {
 
     } catch (error: any) {
       console.error('Automation Fault:', error);
-      setErrorState("Automation bridge connection failed. Please try again or contact support.");
+      setErrorState("Automation bridge connection failed. Please ensure your internet is stable and try again.");
       setIsSubmitting(false);
     }
   };
