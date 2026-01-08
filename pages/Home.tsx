@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { 
   ArrowRight, Layout, Settings, Zap, BarChart3, 
   CheckCircle, ExternalLink, ShieldCheck, Star, Mail
@@ -8,7 +8,8 @@ import {
 import { Link } from 'react-router-dom';
 
 const Home: React.FC = () => {
-  const containerVariants = {
+  // Explicitly typing variants as Variants from framer-motion to resolve string inference issues with 'ease'
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -16,7 +17,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
   };
@@ -129,7 +130,8 @@ const Home: React.FC = () => {
           {services.map((service, i) => (
             <motion.div key={i} variants={itemVariants} className="glass-card p-10 rounded-3xl group hover:border-blue-500/50 transition-all">
               <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                {React.cloneElement(service.icon as React.ReactElement, { size: 32 })}
+                {/* Casting to React.ReactElement<any> to allow 'size' property in cloneElement */}
+                {React.cloneElement(service.icon as React.ReactElement<any>, { size: 32 })}
               </div>
               <h4 className="text-xl font-bold mb-4">{service.title}</h4>
               <p className="text-gray-400 text-sm leading-relaxed">{service.desc}</p>

@@ -76,7 +76,8 @@ const Services: React.FC = () => {
             >
               <div className="flex-1 space-y-8">
                 <div className={`w-20 h-20 rounded-3xl bg-${service.color}-500/10 flex items-center justify-center`}>
-                  {React.cloneElement(service.icon as React.ReactElement, { size: 40 })}
+                  {/* Fixed Lucide icon cloning by providing a broader type to React.cloneElement */}
+                  {React.cloneElement(service.icon as React.ReactElement<any>, { size: 40 })}
                 </div>
                 <h2 className="text-4xl font-bold">{service.title}</h2>
                 <p className="text-gray-400 text-lg leading-relaxed">{service.description}</p>
