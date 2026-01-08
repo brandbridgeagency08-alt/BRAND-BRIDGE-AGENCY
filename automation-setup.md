@@ -1,102 +1,75 @@
-
-# 🚀 Brand Bridge Agency: Lead Automation FIXED (V6)
-
-Follow these steps exactly. This logic is custom-engineered to handle **CORS issues** and ensure lead delivery.
-
-## 🔴 Why was it failing?
-1. **Empty Webhook URL**: The `Contact.tsx` file had an empty string, meaning the data was being sent nowhere.
-2. **CORS Block**: Sending JSON as `application/json` triggers an OPTIONS request. Google Apps Script cannot respond to OPTIONS, so the browser blocked the real data.
-3. **Mismatched Logic**: The script wasn't parsing the raw POST body correctly.
-
----
-
-## STEP 1: Google Sheet Preparation
-1. Create a [Google Sheet](https://sheets.new).
-2. Name it: **"Brand Bridge Leads"**.
-3. **MANDATORY HEADERS (Row 1):**
-   `Timestamp | Name | Business | Email | Message`
-
-## STEP 2: The Core Logic (Apps Script)
-1. Go to **Extensions > Apps Script**.
-2. Replace all code with this:
-
-```javascript
 /**
- * ⚡ BRAND BRIDGE AGENCY - AUTOMATION CORE V6
- * DEBUGGED & CORS-COMPLIANT
+ * ⚡ BRAND BRIDGE AGENCY - AUTOMATION CORE V6.1
+ * FULLY DEBUGGED & PRODUCTION SAFE
  */
 
 function doPost(e) {
-  Logger.log("POST request received.");
-  
   try {
-    // 1. PARSE RAW JSON (Handling text/plain from frontend)
-    var rawData = e.postData.contents;
-    var data = JSON.parse(rawData);
-    
-    // 2. CONNECT TO SHEET
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getActiveSheet();
-    
-    // 3. LOG DATA (Columns: Timestamp, Name, Business, Email, Message)
+    if (!e || !e.postData || !e.postData.contents) {
+      throw new Error("Empty POST body");
+    }
+
+    var data = JSON.parse(e.postData.contents);
+
+    var name = data.name || "";
+    var business = data.businessName || "";
+    var email = data.email || "";
+    var message = data.message || "";
+    var websiteType = data.websiteType || "Not specified";
+
+    // CONNECT TO SHEET
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+    // SAFE ROW APPEND
     sheet.appendRow([
-      new Date().toLocaleString(),
-      data.name,
-      data.businessName,
-      data.email,
-      data.message
+      new Date(),        // ✅ FIXED
+      name,
+      business,
+      email,
+      message
     ]);
-    
-    // 4. CLIENT AUTO-REPLY (From brandbridgeagency08@gmail.com)
-    var clientSubject = "Thanks for contacting Brand Bridge Agency";
-    var clientBody = "Hi " + data.name + ",\n\n" +
-                     "Thanks for contacting Brand Bridge Agency.\n" +
-                     "We have received your request for " + data.businessName + " and will contact you shortly via email.\n\n" +
-                     "Best Regards,\n" +
-                     "Tushar Rishi\n" +
-                     "Brand Bridge Agency Team";
-    
-    GmailApp.sendEmail(data.email, clientSubject, clientBody, {
-      name: "Brand Bridge Agency"
-    });
 
-    // 5. ADMIN NOTIFICATION
-    var adminEmail = "brandbridgeagency08@gmail.com";
-    var adminSubject = "🔥 NEW PROJECT LEAD: " + data.businessName;
-    var adminBody = "A new lead has been captured!\n\n" +
-                    "Name: " + data.name + "\n" +
-                    "Email: " + data.email + "\n" +
-                    "Business: " + data.businessName + "\n" +
-                    "Project Type: " + data.websiteType + "\n" +
-                    "Message: " + data.message;
-                    
-    GmailApp.sendEmail(adminEmail, adminSubject, adminBody);
+    // CLIENT AUTO-REPLY
+    GmailApp.sendEmail(
+      email,
+      "Thanks for contacting Brand Bridge Agency",
+      "Hi " + name + ",\n\n" +
+      "Thanks for contacting Brand Bridge Agency.\n" +
+      "We have received your request for " + business + " and will contact you shortly.\n\n" +
+      "Best Regards,\n" +
+      "Brand Bridge Agency Team",
+      { name: "Brand Bridge Agency" }
+    );
 
-    return ContentService.createTextOutput(JSON.stringify({"success": true}))
-                         .setMimeType(ContentService.MimeType.JSON);
+    // ADMIN EMAIL
+    GmailApp.sendEmail(
+      "brandbridgeagency08@gmail.com",
+      "🔥 NEW PROJECT LEAD: " + business,
+      "New Lead Details:\n\n" +
+      "Name: " + name + "\n" +
+      "Email: " + email + "\n" +
+      "Business: " + business + "\n" +
+      "Website Type: " + websiteType + "\n" +
+      "Message: " + message
+    );
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({"success": false, "error": err.message}))
-                         .setMimeType(ContentService.MimeType.JSON);
+    Logger.log(err.toString());
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }
-```
 
-## STEP 3: Deploy (G-Suite Identity)
-1. Click **Deploy > New Deployment**.
-2. Select **Web App**.
-3. **Execute as:** `Me (brandbridgeagency08@gmail.com)`
-4. **Who has access:** `Anyone`
-5. Click **Deploy** and complete the **Authorization** (Advanced > Go to Brand Bridge Leads (unsafe) > Allow).
-6. Copy the **Web App URL**.
-
-## STEP 4: Connect the UI
-1. Paste the URL into `pages/Contact.tsx` inside the `AUTOMATION_WEBHOOK_URL` variable.
-
----
-
-### Verification Proof:
-✔ No phone number field in script or sheet.
-✔ `GmailApp` ensures the sender is your authorized agency email.
-✔ `JSON.parse` handles the CORS-bypass payload perfectly.
-✔ Local Admin Dashboard synced in tandem.
+/**
+ * ✅ HEALTH CHECK (IMPORTANT)
+ */
+function doGet() {
+  return ContentService
+    .createTextOutput("Brand Bridge Automation is LIVE")
+    .setMimeType(ContentService.MimeType.TEXT);
+}
