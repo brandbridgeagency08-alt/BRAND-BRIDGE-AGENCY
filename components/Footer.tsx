@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Linkedin, Twitter, Facebook } from 'lucide-react';
+import { Mail, MapPin, Linkedin, Twitter, Facebook } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -40,22 +40,15 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-bold mb-6">Services</h4>
             <ul className="space-y-4 text-gray-400 text-sm">
-              <li><a href="#" className="hover:text-white transition-colors">Web Development</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Management</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Lead Generation</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Growth Systems</a></li>
+              <li><Link to="/services" className="hover:text-white transition-colors">Web Development</Link></li>
+              <li><Link to="/services" className="hover:text-white transition-colors">Management</Link></li>
+              <li><Link to="/services" className="hover:text-white transition-colors">Automation</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-6">Contact Details</h4>
+            <h4 className="text-white font-bold mb-6">Inquiry Channel</h4>
             <ul className="space-y-4">
-              <li className="flex items-center space-x-3 group">
-                <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                  <Phone size={16} />
-                </div>
-                <a href="tel:6350154327" className="text-gray-400 text-sm hover:text-white transition-colors">6350154327</a>
-              </li>
               <li className="flex items-center space-x-3 group">
                 <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors">
                   <Mail size={16} />
@@ -66,18 +59,14 @@ const Footer: React.FC = () => {
                 <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
                   <MapPin size={16} />
                 </div>
-                <span className="text-gray-400 text-sm">Global Remote Agency</span>
+                <span className="text-gray-400 text-sm">Global Remote Operation</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-gray-500 text-xs gap-4">
-          <p>© 2025 Brand Bridge Agency. All Rights Reserved.</p>
-          <div className="flex space-x-8">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-          </div>
+          <p>© 2025 Brand Bridge Agency. All Digital Processes Secured.</p>
         </div>
       </div>
     </footer>

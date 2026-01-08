@@ -4,7 +4,6 @@ export interface Lead {
   name: string;
   businessName: string;
   email: string;
-  phone: string;
   websiteType: string;
   budgetRange: string;
   message: string;

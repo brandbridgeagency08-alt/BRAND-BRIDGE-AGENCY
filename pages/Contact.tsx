@@ -2,16 +2,15 @@
 import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Send, Phone, Mail, MapPin, 
-  CheckCircle2, Clock, Globe, ShieldCheck, Zap
+  Send, Mail, CheckCircle2, ShieldCheck, Zap
 } from 'lucide-react';
 import { WebsiteType, BudgetRange } from '../types';
 import { LeadContext } from '../App';
 
 /**
- * 🛠️ CRITICAL STEP:
- * 1. Follow the steps in automation-setup.md to get your Web App URL.
- * 2. Paste that URL here between the quotes.
+ * 🛠️ CRITICAL ACTION: 
+ * 1. Deploy the new script from automation-setup.md.
+ * 2. Paste the Web App URL below.
  */
 const AUTOMATION_WEBHOOK_URL = ''; 
 
@@ -23,7 +22,6 @@ const Contact: React.FC = () => {
     name: '',
     businessName: '',
     email: '',
-    phone: '',
     websiteType: WebsiteType.Business,
     budgetRange: BudgetRange.Growth,
     message: ''
@@ -36,6 +34,7 @@ const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    console.log("Submit initiated: Data package prepared (No Phone).");
 
     const newLead = {
       ...formData,
@@ -46,35 +45,30 @@ const Contact: React.FC = () => {
 
     try {
       if (AUTOMATION_WEBHOOK_URL) {
-        // Send data to Google Apps Script
-        // We use 'no-cors' because Google Scripts redirect after POST, 
-        // which browsers often block. 'no-cors' allows the request to finish.
+        // We use 'no-cors' to allow the request to trigger Google Apps Script successfully.
         await fetch(AUTOMATION_WEBHOOK_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: {
-            'Content-Type': 'text/plain', // Using text/plain avoids CORS preflight issues with Google Scripts
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(newLead)
         });
-        console.log("Automation: Data sent to Webhook.");
-      } else {
-        console.warn("Automation: URL missing. Lead saved to local Admin Panel only.");
+        console.log("Automation: Trigger signal sent to Google Apps Script.");
       }
 
-      // Add to local state/dashboard
+      // Local storage persistence
       addLead(newLead);
       
-      // Artificial delay for UI smoothness
       setTimeout(() => {
         setIsSubmitting(false);
         setSubmitted(true);
-      }, 1200);
+      }, 1000);
 
     } catch (error) {
-      console.error('Automation Error:', error);
+      console.error('Automation Failed:', error);
       setIsSubmitting(false);
-      setSubmitted(true); // Still show success to user
+      setSubmitted(true); // Don't block the user if only the hook fails
     }
   };
 
@@ -89,15 +83,15 @@ const Contact: React.FC = () => {
           <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 text-white">
             <CheckCircle2 size={48} />
           </div>
-          <h2 className="text-4xl font-bold mb-6">Success!</h2>
+          <h2 className="text-4xl font-bold mb-6">Request Received!</h2>
           <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-            Your inquiry has been processed. Our automation has sent an <b>auto-reply to your email</b>. Check your inbox (and spam) shortly!
+            Lead saved. Our automation is sending an <b>auto-reply</b> to <b>{formData.email}</b>. Please check your inbox.
           </p>
           <button 
             onClick={() => setSubmitted(false)}
-            className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform shadow-lg"
+            className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform"
           >
-            Send Another Inquiry
+            New Request
           </button>
         </motion.div>
       </div>
@@ -110,32 +104,34 @@ const Contact: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-20">
           <div className="lg:w-2/5 space-y-12">
             <div>
-              <h1 className="text-5xl md:text-6xl font-extrabold mb-6 tracking-tight">Ready to <span className="text-gradient">Grow?</span></h1>
+              <h1 className="text-5xl md:text-6xl font-extrabold mb-6 tracking-tight">Let's <span className="text-gradient">Automate.</span></h1>
               <p className="text-gray-400 text-xl leading-relaxed">
-                Contact Brand Bridge Agency. Our automated systems handle your inquiry instantly.
+                Connect your business to modern digital infrastructure. No phone calls needed—strictly efficient email communication.
               </p>
             </div>
 
             <div className="space-y-6">
-              <a href="tel:6350154327" className="flex items-center space-x-6 p-6 glass-card rounded-2xl hover:bg-white/5 transition-colors block">
-                <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400">
-                  <Phone size={24} />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-400 font-bold uppercase tracking-widest">Phone</div>
-                  <div className="text-xl font-bold">6350154327</div>
-                </div>
-              </a>
-
               <a href="mailto:brandbridgeagency08@gmail.com" className="flex items-center space-x-6 p-6 glass-card rounded-2xl hover:bg-white/5 transition-colors block">
                 <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400">
                   <Mail size={24} />
                 </div>
                 <div>
-                  <div className="text-sm text-gray-400 font-bold uppercase tracking-widest">Official Email</div>
+                  <div className="text-sm text-gray-400 font-bold uppercase tracking-widest">Email Channel</div>
                   <div className="text-xl font-bold">brandbridgeagency08@gmail.com</div>
                 </div>
               </a>
+              
+              <div className="p-8 border border-white/5 rounded-3xl space-y-4 bg-white/2">
+                <h4 className="font-bold flex items-center space-x-2 text-emerald-400">
+                  <ShieldCheck size={20} />
+                  <span>Verified Automation</span>
+                </h4>
+                <ul className="space-y-3 text-sm text-gray-400">
+                  <li>✔ Real-time Lead Storage</li>
+                  <li>✔ Instant Auto-Reply</li>
+                  <li>✔ 24/7 Monitoring</li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -147,32 +143,29 @@ const Contact: React.FC = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 ml-1">Name</label>
-                  <input required name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors" />
+                  <label className="text-sm font-bold text-gray-400">Your Name</label>
+                  <input required name="name" value={formData.name} onChange={handleChange} placeholder="John Doe" className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 ml-1">Business</label>
-                  <input required name="businessName" value={formData.businessName} onChange={handleChange} placeholder="Company Name" className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors" />
+                  <label className="text-sm font-bold text-gray-400">Business Name</label>
+                  <input required name="businessName" value={formData.businessName} onChange={handleChange} placeholder="Empire Inc." className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 ml-1">Email</label>
-                  <input required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@address.com" className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 ml-1">Phone</label>
-                  <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone Number" className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors" />
-                </div>
+              </div>
+
+              <div className="space-y-2 relative z-10">
+                <label className="text-sm font-bold text-gray-400">Email Address</label>
+                <input required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="john@example.com" className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors" />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 ml-1">Project Type</label>
+                  <label className="text-sm font-bold text-gray-400">Website Type</label>
                   <select name="websiteType" value={formData.websiteType} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 appearance-none">
                     {Object.values(WebsiteType).map(type => <option key={type} value={type} className="bg-gray-950">{type}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 ml-1">Budget</label>
+                  <label className="text-sm font-bold text-gray-400">Investment</label>
                   <select name="budgetRange" value={formData.budgetRange} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 appearance-none">
                     {Object.values(BudgetRange).map(range => <option key={range} value={range} className="bg-gray-950">{range}</option>)}
                   </select>
@@ -180,8 +173,8 @@ const Contact: React.FC = () => {
               </div>
 
               <div className="space-y-2 relative z-10">
-                <label className="text-sm font-bold text-gray-400 ml-1">Details</label>
-                <textarea required name="message" value={formData.message} onChange={handleChange} rows={4} placeholder="Your project requirements..." className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors resize-none"></textarea>
+                <label className="text-sm font-bold text-gray-400">Project Requirements</label>
+                <textarea required name="message" value={formData.message} onChange={handleChange} rows={5} placeholder="Tell us about your digital goals..." className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors resize-none"></textarea>
               </div>
 
               <button 
@@ -189,7 +182,7 @@ const Contact: React.FC = () => {
                 disabled={isSubmitting}
                 className={`w-full py-5 rounded-2xl font-extrabold text-lg flex items-center justify-center space-x-3 transition-all ${isSubmitting ? 'bg-gray-800 text-gray-500' : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl shadow-blue-900/20'}`}
               >
-                {isSubmitting ? <span>Sending...</span> : <><Send size={24} /><span>Send Inquiry</span></>}
+                {isSubmitting ? <span>Executing Automation...</span> : <><Send size={24} /><span>Request Website</span></>}
               </button>
             </form>
           </div>

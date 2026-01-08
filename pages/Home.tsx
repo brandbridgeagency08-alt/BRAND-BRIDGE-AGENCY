@@ -3,8 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   ArrowRight, Layout, Settings, Zap, BarChart3, 
-  CheckCircle, ExternalLink, ShieldCheck, Star,
-  Phone, Mail
+  CheckCircle, ExternalLink, ShieldCheck, Star, Mail
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -190,7 +189,7 @@ const Home: React.FC = () => {
               <div className="space-y-6">
                 <h4 className="text-3xl font-bold">First Real-World Project</h4>
                 <p className="text-gray-400 text-lg leading-relaxed">
-                  We built a comprehensive e-commerce showcase for Gupta Footwear, featuring advanced grid layouts, fast image loading, and a mobile-first approach that increased their digital inquiries by 40%.
+                  We built a comprehensive e-commerce showcase for Gupta Footwear, featuring advanced grid layouts, fast image loading, and a mobile-first approach.
                 </p>
                 <div className="flex flex-wrap gap-3">
                   {['React', 'Tailwind CSS', 'Framer Motion', 'SEO Optimized'].map(tag => (
@@ -203,56 +202,11 @@ const Home: React.FC = () => {
               <div className="grid grid-cols-2 gap-8 py-8 border-y border-white/10">
                 <div>
                   <div className="text-3xl font-extrabold text-blue-400 mb-1">99%</div>
-                  <div className="text-sm text-gray-400 uppercase tracking-widest font-bold">Speed Score</div>
+                  <div className="text-sm text-gray-400 uppercase tracking-widest font-bold">Performance</div>
                 </div>
                 <div>
                   <div className="text-3xl font-extrabold text-purple-400 mb-1">40%</div>
-                  <div className="text-sm text-gray-400 uppercase tracking-widest font-bold">Leads Increased</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose Us */}
-      <section className="py-32 container mx-auto px-6">
-        <div className="glass-card rounded-[3rem] p-12 md:p-20 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-600/5 blur-[100px]"></div>
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-extrabold mb-8">Why Brands Bridge the Gap With Us?</h2>
-              <div className="space-y-6">
-                {whyChooseUs.map((item, i) => (
-                  <div key={i} className="flex items-center space-x-4">
-                    <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
-                      <CheckCircle size={14} className="text-blue-400" />
-                    </div>
-                    <span className="text-xl font-medium text-gray-200">{item}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-12">
-                <Link to="/contact" className="inline-block px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full font-bold text-white hover:opacity-90 transition-opacity">
-                  Ready to start? Let's talk
-                </Link>
-              </div>
-            </div>
-            <div className="relative">
-              <img 
-                src="https://picsum.photos/seed/tech/800/800" 
-                alt="Tech Illustration" 
-                className="rounded-3xl shadow-2xl relative z-10 animate-float"
-              />
-              <div className="absolute -bottom-8 -left-8 glass-card p-6 rounded-2xl z-20 shadow-2xl">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white">
-                    <Zap size={24} />
-                  </div>
-                  <div>
-                    <div className="font-bold text-white">Automation Ready</div>
-                    <div className="text-xs text-gray-400">Lead capture live</div>
-                  </div>
+                  <div className="text-sm text-gray-400 uppercase tracking-widest font-bold">Growth Rate</div>
                 </div>
               </div>
             </div>
@@ -269,15 +223,11 @@ const Home: React.FC = () => {
           <p className="text-gray-400 text-xl mb-12 max-w-2xl mx-auto">
             Our experts are ready to transform your digital presence into a 24/7 revenue-generating machine.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
-            <a href="tel:6350154327" className="flex items-center space-x-3 px-8 py-4 rounded-full bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10">
-              <Phone size={20} className="text-blue-400" />
-              <span>6350154327</span>
-            </a>
-            <a href="mailto:brandbridgeagency08@gmail.com" className="flex items-center space-x-3 px-8 py-4 rounded-full bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10">
-              <Mail size={20} className="text-purple-400" />
-              <span>Email Us</span>
-            </a>
+          <div className="flex justify-center">
+            <Link to="/contact" className="flex items-center space-x-3 px-10 py-5 rounded-full bg-white text-black font-bold hover:scale-105 transition-transform">
+              <Mail size={20} className="text-purple-600" />
+              <span>Contact Us via Email</span>
+            </Link>
           </div>
         </div>
       </section>
