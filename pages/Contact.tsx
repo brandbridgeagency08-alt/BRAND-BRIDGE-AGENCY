@@ -1,11 +1,10 @@
 
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Send, Mail, CheckCircle2, ShieldCheck, Zap, AlertTriangle
+  Send, CheckCircle2, ShieldCheck, Zap, AlertTriangle
 } from 'lucide-react';
 import { WebsiteType, BudgetRange } from '../types';
-import { LeadContext } from '../App';
 
 /**
  * ⚡ BRAND BRIDGE AUTOMATION BRIDGE
@@ -14,15 +13,14 @@ import { LeadContext } from '../App';
 const AUTOMATION_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz_T16mHboEzD2HpPr4TxEH1UgWbMUeMZQ-Mu1wkxbQqlZ0hNnMVOZ7yUy206I5_KKgHg/exec";
 
 const Contact: React.FC = () => {
-  const { addLead } = useContext(LeadContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorState, setErrorState] = useState<string | null>(null);
   
   /**
-   * 🛡️ FORM STATE ISOLATION (FIX B)
-   * Initialized EXACTLY as empty strings. 
-   * No admin data or demo strings allowed.
+   * 🛡️ FORM STATE ISOLATION
+   * Initialized EXACTLY as empty strings to prevent state contamination.
+   * LeadContext is REMOVED to ensure zero shared state with Admin systems.
    */
   const [formData, setFormData] = useState({
     name: "",
@@ -35,7 +33,7 @@ const Contact: React.FC = () => {
 
   /**
    * 🔒 COMPONENT MOUNT PURGE
-   * Ensures form is 100% clean upon loading.
+   * Redundant safety check to ensure the form is 100% clean on load.
    */
   useEffect(() => {
     setFormData({
@@ -67,15 +65,14 @@ const Contact: React.FC = () => {
       budgetRange: formData.budget || BudgetRange.Startup,
       message: formData.message,
       id: Math.random().toString(36).substr(2, 9),
-      status: 'New' as const,
       createdAt: new Date().toLocaleString()
     };
 
     try {
       /**
-       * ⚡ FETCH PROTOCOL OVERHAUL (FIX A)
+       * ⚡ FETCH PROTOCOL REFINEMENT
        * - method: POST
-       * - Content-Type: text/plain;charset=utf-8 (Critical for GAS/CORS)
+       * - Content-Type: text/plain;charset=utf-8 (Prevents CORS Preflight failures)
        * - body: JSON.stringify(payload)
        */
       const response = await fetch(AUTOMATION_WEBHOOK_URL, {
@@ -93,17 +90,15 @@ const Contact: React.FC = () => {
       try {
         result = JSON.parse(rawResponse);
       } catch (parseError) {
-        throw new Error("Server returned an invalid response format.");
+        throw new Error("The lead engine returned an invalid data format.");
       }
       
       /**
        * SUCCESS VALIDATION
-       * Only proceed if data.success is explicitly true.
+       * Only proceed if the bridge explicitly returns success: true
        */
       if (result && result.success === true) {
-        addLead(payload);
-        
-        // POST-SUBMIT CLEANUP (FIX C)
+        // POST-SUBMIT CLEANUP
         setFormData({
           name: "",
           brand: "",
@@ -116,12 +111,12 @@ const Contact: React.FC = () => {
         setIsSubmitting(false);
         setSubmitted(true);
       } else {
-        throw new Error(result.error || "Submission was rejected by the lead engine.");
+        throw new Error(result.error || "The submission was rejected by the lead engine.");
       }
 
     } catch (error: any) {
-      // Descriptive error only (Removing generic 'infrastructure unreachable')
-      setErrorState(error.message || "An error occurred during submission. Please try again.");
+      // Direct error reporting only - No generic infrastructure fallbacks.
+      setErrorState(error.message || "An unexpected error occurred. Please verify your connection.");
       setIsSubmitting(false);
     }
   };
@@ -139,7 +134,7 @@ const Contact: React.FC = () => {
           </div>
           <h2 className="text-4xl font-bold mb-6 text-white">Inquiry Verified</h2>
           <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-            Your project details have been successfully transmitted. Our automation engine is now processing your request.
+            Your project details have been successfully transmitted to our lead engine. A confirmation email is on its way.
           </p>
           <button 
             onClick={() => setSubmitted(false)}
@@ -156,12 +151,12 @@ const Contact: React.FC = () => {
     <div className="py-20">
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row gap-20">
-          {/* Info Side */}
+          {/* Information Column */}
           <div className="lg:w-2/5 space-y-12">
             <div>
               <h1 className="text-5xl md:text-6xl font-extrabold mb-6 tracking-tight text-white">Scale your <span className="text-gradient">Vision.</span></h1>
               <p className="text-gray-400 text-xl leading-relaxed">
-                Our secure lead capture system ensures your business requirements are processed with 100% data integrity.
+                Connect with our experts. Our secure lead capture system ensures your data is protected and processed with absolute priority.
               </p>
             </div>
 
@@ -173,21 +168,21 @@ const Contact: React.FC = () => {
               <ul className="space-y-3 text-sm text-gray-400">
                 <li className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Secure TLS Transmission</span>
+                  <span>Zero State Contamination Protocol</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Zero Shared State Protocol</span>
+                  <span>Isolated Client Environment</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Automatic Lead Encryption</span>
+                  <span>Direct Webhook Automation</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Form Side */}
+          {/* Form Column */}
           <div className="lg:w-3/5">
             <form onSubmit={handleSubmit} className="glass-card p-8 md:p-12 rounded-[2rem] space-y-8 relative overflow-hidden shadow-2xl">
               <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
@@ -279,7 +274,7 @@ const Contact: React.FC = () => {
               </div>
 
               {errorState && (
-                <div className="flex items-center space-x-3 text-red-400 bg-red-400/10 p-4 rounded-xl border border-red-400/20 animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-center space-x-3 text-red-400 bg-red-400/10 p-4 rounded-xl border border-red-400/20">
                   <AlertTriangle size={20} />
                   <span className="text-sm font-medium">{errorState}</span>
                 </div>
@@ -288,7 +283,7 @@ const Contact: React.FC = () => {
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className={`w-full py-5 rounded-2xl font-extrabold text-lg flex items-center justify-center space-x-3 transition-all ${isSubmitting ? 'bg-gray-800 text-gray-500 cursor-wait' : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl shadow-blue-900/20 active:scale-95 hover:brightness-110'}`}
+                className={`w-full py-5 rounded-2xl font-extrabold text-lg flex items-center justify-center space-x-3 transition-all ${isSubmitting ? 'bg-gray-800 text-gray-500 cursor-wait' : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl shadow-blue-900/20 active:scale-95'}`}
               >
                 {isSubmitting ? (
                   <>
