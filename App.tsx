@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
 import Home from './pages/Home';
@@ -10,7 +10,16 @@ import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
-// Global context for leads
+// Helper to scroll to top on page change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
+// Global context for leads management
 export const LeadContext = React.createContext<{
   leads: any[];
   addLead: (lead: any) => void;
@@ -29,7 +38,6 @@ const App: React.FC = () => {
       const saved = localStorage.getItem('bba_leads');
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
-      console.warn("LocalStorage access failed - lead persistence disabled.", e);
       return [];
     }
   });
@@ -37,36 +45,25 @@ const App: React.FC = () => {
   const addLead = (lead: any) => {
     const newLeads = [lead, ...leads];
     setLeads(newLeads);
-    try {
-      localStorage.setItem('bba_leads', JSON.stringify(newLeads));
-    } catch (e) {
-      console.warn("Failed to save lead to storage", e);
-    }
+    localStorage.setItem('bba_leads', JSON.stringify(newLeads));
   };
 
   const updateLeadStatus = (id: string, status: string) => {
     const newLeads = leads.map(l => l.id === id ? { ...l, status } : l);
     setLeads(newLeads);
-    try {
-      localStorage.setItem('bba_leads', JSON.stringify(newLeads));
-    } catch (e) {
-      console.warn("Failed to update lead in storage", e);
-    }
+    localStorage.setItem('bba_leads', JSON.stringify(newLeads));
   };
 
   const deleteLead = (id: string) => {
     const newLeads = leads.filter(l => l.id !== id);
     setLeads(newLeads);
-    try {
-      localStorage.setItem('bba_leads', JSON.stringify(newLeads));
-    } catch (e) {
-      console.warn("Failed to delete lead from storage", e);
-    }
+    localStorage.setItem('bba_leads', JSON.stringify(newLeads));
   };
 
   return (
     <LeadContext.Provider value={{ leads, addLead, updateLeadStatus, deleteLead }}>
       <Router>
+        <ScrollToTop />
         <div className="flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-grow pt-16">

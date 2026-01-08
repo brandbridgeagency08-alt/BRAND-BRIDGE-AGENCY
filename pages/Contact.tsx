@@ -9,7 +9,6 @@ import { LeadContext } from '../App';
 
 /**
  * ⚡ PRODUCTION AUTOMATION WEBHOOK
- * Strictly used for data submission to the verified Google Apps Script endpoint.
  */
 const AUTOMATION_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz_T16mHboEzD2HpPr4TxEH1UgWbMUeMZQ-Mu1wkxbQqlZ0hNnMVOZ7yUy206I5_KKgHg/exec";
 
@@ -20,16 +19,16 @@ const Contact: React.FC = () => {
   const [errorState, setErrorState] = useState<string | null>(null);
   
   /**
-   * 🛡️ SECURITY REMEDIATION:
-   * State is initialized with empty strings to prevent any administrative
-   * or previous session data from leaking into public inputs.
+   * 🛡️ MANDATORY ROOT CAUSE FIX:
+   * State is initialized STRICTLY with empty strings.
+   * No admin, demo, or hardcoded values are permitted here.
    */
   const [formData, setFormData] = useState({
     name: "",
-    businessName: "",
+    brand: "",
     email: "",
-    websiteType: WebsiteType.Business,
-    budgetRange: BudgetRange.Growth,
+    projectType: "",
+    budget: "",
     message: ""
   });
 
@@ -42,18 +41,23 @@ const Contact: React.FC = () => {
     setIsSubmitting(true);
     setErrorState(null);
     
+    /**
+     * Data Mapping Layer:
+     * Translating clean frontend keys to system-required keys for Lead Processing.
+     */
     const newLead = {
-      ...formData,
+      name: formData.name,
+      businessName: formData.brand,
+      email: formData.email,
+      websiteType: formData.projectType || WebsiteType.Other,
+      budgetRange: formData.budget || BudgetRange.Startup,
+      message: formData.message,
       id: Math.random().toString(36).substr(2, 9),
       status: 'New' as const,
       createdAt: new Date().toLocaleString()
     };
 
     try {
-      /**
-       * ⚡ DATA BROADCAST PROTOCOL
-       * Sends lead payload to the automation grid via non-preflighted POST request.
-       */
       const response = await fetch(AUTOMATION_WEBHOOK_URL, {
         method: 'POST',
         headers: {
@@ -76,11 +80,11 @@ const Contact: React.FC = () => {
         setIsSubmitting(false);
         setSubmitted(true);
       } else {
-        throw new Error(result.error || "Remote automation server rejected lead.");
+        throw new Error(result.error || "Remote server rejected submission.");
       }
 
     } catch (error: any) {
-      setErrorState("Connection fault: The automation bridge is currently unavailable.");
+      setErrorState("Connection fault: Infrastructure currently unreachable.");
       setIsSubmitting(false);
     }
   };
@@ -98,13 +102,13 @@ const Contact: React.FC = () => {
           </div>
           <h2 className="text-4xl font-bold mb-6 text-white">Inquiry Verified</h2>
           <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-            Lead successfully encrypted and transmitted. A confirmation sequence has been initiated for <b>{formData.email}</b>.
+            Your project details have been successfully transmitted to our lead engine.
           </p>
           <button 
             onClick={() => setSubmitted(false)}
             className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform"
           >
-            New Inquiry
+            Start New Inquiry
           </button>
         </motion.div>
       </div>
@@ -119,21 +123,11 @@ const Contact: React.FC = () => {
             <div>
               <h1 className="text-5xl md:text-6xl font-extrabold mb-6 tracking-tight text-white">Scale your <span className="text-gradient">Vision.</span></h1>
               <p className="text-gray-400 text-xl leading-relaxed">
-                Connect with Brand Bridge Agency. Our lead engine ensures your inquiry is processed instantly via secure cloud infrastructure.
+                Connect with our experts. Our secure lead capture system ensures your data is protected and processed with priority.
               </p>
             </div>
 
             <div className="space-y-6">
-              <a href="mailto:brandbridgeagency08@gmail.com" className="flex items-center space-x-6 p-6 glass-card rounded-2xl hover:bg-white/5 transition-colors block border border-white/5">
-                <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400">
-                  <Mail size={24} />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-400 font-bold uppercase tracking-widest">Secure Channel</div>
-                  <div className="text-xl font-bold text-white">brandbridgeagency08@gmail.com</div>
-                </div>
-              </a>
-              
               <div className="p-8 border border-white/5 rounded-3xl space-y-4 bg-white/2 shadow-inner">
                 <h4 className="font-bold flex items-center space-x-2 text-blue-400">
                   <ShieldCheck size={20} />
@@ -142,15 +136,15 @@ const Contact: React.FC = () => {
                 <ul className="space-y-3 text-sm text-gray-400">
                   <li className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span>TLS End-to-End Encryption</span>
+                    <span>Zero Data Leak Security Protocol</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span>Zero Admin Credential Exposure</span>
+                    <span>Strict Separation of Concerns</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span>Automatic PII Anonymization</span>
+                    <span>Encrypted Transmission Standard</span>
                   </li>
                 </ul>
               </div>
@@ -166,37 +160,85 @@ const Contact: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-400">Full Name</label>
-                  <input required name="name" value={formData.name} onChange={handleChange} placeholder="First and Last Name" className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors text-white" />
+                  <input 
+                    required 
+                    name="name" 
+                    value={formData.name} 
+                    onChange={handleChange} 
+                    placeholder="Enter your name" 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors text-white" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-400">Company / Brand</label>
-                  <input required name="businessName" value={formData.businessName} onChange={handleChange} placeholder="Entity Name" className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors text-white" />
+                  <input 
+                    required 
+                    name="brand" 
+                    value={formData.brand} 
+                    onChange={handleChange} 
+                    placeholder="Enter your company name" 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors text-white" 
+                  />
                 </div>
               </div>
 
               <div className="space-y-2 relative z-10">
                 <label className="text-sm font-bold text-gray-400">Email Address</label>
-                <input required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="name@business.com" className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors text-white" />
+                <input 
+                  required 
+                  type="email" 
+                  name="email" 
+                  value={formData.email} 
+                  onChange={handleChange} 
+                  placeholder="name@example.com" 
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors text-white" 
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-400">Project Type</label>
-                  <select name="websiteType" value={formData.websiteType} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 appearance-none text-white">
-                    {Object.values(WebsiteType).map(type => <option key={type} value={type} className="bg-gray-900">{type}</option>)}
+                  <select 
+                    required
+                    name="projectType" 
+                    value={formData.projectType} 
+                    onChange={handleChange} 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 appearance-none text-white"
+                  >
+                    <option value="" className="bg-gray-900">Select Project Type</option>
+                    {Object.values(WebsiteType).map(type => (
+                      <option key={type} value={type} className="bg-gray-900">{type}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400">Investment Range</label>
-                  <select name="budgetRange" value={formData.budgetRange} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 appearance-none text-white">
-                    {Object.values(BudgetRange).map(range => <option key={range} value={range} className="bg-gray-900">{range}</option>)}
+                  <label className="text-sm font-bold text-gray-400">Budget Scope</label>
+                  <select 
+                    required
+                    name="budget" 
+                    value={formData.budget} 
+                    onChange={handleChange} 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 appearance-none text-white"
+                  >
+                    <option value="" className="bg-gray-900">Select Budget Range</option>
+                    {Object.values(BudgetRange).map(range => (
+                      <option key={range} value={range} className="bg-gray-900">{range}</option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div className="space-y-2 relative z-10">
                 <label className="text-sm font-bold text-gray-400">Project Mission</label>
-                <textarea required name="message" value={formData.message} onChange={handleChange} rows={5} placeholder="Tell us about your digital goals..." className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors resize-none text-white"></textarea>
+                <textarea 
+                  required 
+                  name="message" 
+                  value={formData.message} 
+                  onChange={handleChange} 
+                  rows={5} 
+                  placeholder="Describe your goals and requirements..." 
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:border-blue-500 transition-colors resize-none text-white"
+                ></textarea>
               </div>
 
               {errorState && (
@@ -214,12 +256,12 @@ const Contact: React.FC = () => {
                 {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Encrypting...</span>
+                    <span>Processing...</span>
                   </>
                 ) : (
                   <>
                     <Send size={24} />
-                    <span>Deploy Project Inquiry</span>
+                    <span>Send Project Inquiry</span>
                   </>
                 )}
               </button>
